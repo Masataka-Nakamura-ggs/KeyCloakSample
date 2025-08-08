@@ -1,0 +1,36 @@
+import NextAuth from "next-auth";
+import type { NextAuthConfig } from "next-auth";
+import KeycloakProvider from "next-auth/providers/keycloak";
+
+// NextAuth（Auth.js）の設定
+export const config = {
+  providers: [
+    KeycloakProvider({
+      clientId: process.env.AUTH_KEYCLOAK_ID || "",
+      clientSecret: process.env.AUTH_KEYCLOAK_SECRET || "",
+      issuer: process.env.AUTH_KEYCLOAK_ISSUER || "",
+    }),
+  ],
+  debug: process.env.NODE_ENV === "development",
+  callbacks: {
+    // セッションにユーザー情報を追加
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.sub || "";
+        session.user.name = token.name || null;
+        session.user.email = token.email || null;
+      }
+      return session;
+    },
+    // トークンからの情報取得とセッションへの受け渡し
+    async jwt({ token, profile }) {
+      if (profile) {
+        token.name = profile.name;
+        token.email = profile.email;
+      }
+      return token;
+    },
+  },
+} satisfies NextAuthConfig;
+
+export const { handlers, auth, signIn, signOut } = NextAuth(config);
