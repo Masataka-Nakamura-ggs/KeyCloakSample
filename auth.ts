@@ -1,5 +1,4 @@
-import NextAuth from "next-auth";
-import { NextAuthOptions } from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import { getServerSession } from "next-auth/next";
 import KeycloakProvider from "next-auth/providers/keycloak";
 
